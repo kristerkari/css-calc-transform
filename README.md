@@ -1,5 +1,10 @@
 # CSS calc() to Javascript
 
+[![NPM version](http://img.shields.io/npm/v/css-calc-transform.svg)](https://www.npmjs.org/package/css-calc-transform)
+[![Build Status](https://travis-ci.org/kristerkari/css-calc-transform.svg?branch=master)](https://travis-ci.org/kristerkari/css-calc-transform)
+[![Build status](https://ci.appveyor.com/api/projects/status/1y0weqkwsafh5fwq/branch/master?svg=true)](https://ci.appveyor.com/project/kristerkari/css-calc-transform/branch/master)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
+
 Tiny library to transform CSS properties with [CSS calc() function](https://developer.mozilla.org/en-US/docs/Web/CSS/calc) values to pixels based on window and element dimensions.
 
 ## Install
