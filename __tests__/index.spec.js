@@ -21,6 +21,16 @@ describe("CSS calc function", () => {
     ).toEqual(470);
   });
 
+  it("should support percentages without passing window dimensions", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(100% - 10px)",
+        parent
+      })
+    ).toEqual(470);
+  });
+
   it("should support px unit", () => {
     expect(
       transform({
@@ -32,6 +42,15 @@ describe("CSS calc function", () => {
     ).toEqual(38.57142857142857);
   });
 
+  it("should support px unit without passing window dimensions or parent element size", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10px + (100px / 3.5))"
+      })
+    ).toEqual(38.57142857142857);
+  });
+
   it("should support vh unit", () => {
     expect(
       transform({
@@ -39,6 +58,16 @@ describe("CSS calc function", () => {
         value: "calc(50vh + 10px)",
         win,
         parent
+      })
+    ).toEqual(330);
+  });
+
+  it("should support vh unit without passing parent element size", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vh + 10px)",
+        win
       })
     ).toEqual(330);
   });
