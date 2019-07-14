@@ -11,6 +11,7 @@
     "!**/__tests__",
     "!**/__mocks__",
     "!**/perf-tests",
+    "index.d.ts",
     "CHANGELOG.md",
     "README.md"
   ],
