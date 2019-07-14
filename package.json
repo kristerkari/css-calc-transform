@@ -1,6 +1,6 @@
 {
   "name": "css-calc-transform",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Transform CSS properties with calc() values to pixels based on window and element dimensions.",
   "main": "dist/index.js",
   "author": "Krister Kari",
