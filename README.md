@@ -52,7 +52,7 @@ transform({
 470
 ```
 
-When you want to transform CSS `calc()` value containing percentages into a number:
+When you want to transform CSS `calc()` value containing viewport units into a number:
 
 ```js
 import { transform } from "css-calc-transform";
