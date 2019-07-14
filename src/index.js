@@ -2,9 +2,11 @@ const CALC_REG = /\bcalc\(([\s\S]+)\)/;
 const PERCENT = /[\d.]+%/;
 const VIEWPORT_WIDTH = /[\d.]+vw/;
 const VIEWPORT_HEIGHT = /[\d.]+vh/;
+const VIEWPORT_MIN = /[\d.]+vmin/;
+const VIEWPORT_MAX = /[\d.]+vmax/;
 const PIXEL = /(\d+)px/g;
 const REM = /[\d.]+rem/;
-const MATH_EXP = /[+\-/*]?[\d.]+(px|%|rem|vw|vh)?/g;
+const MATH_EXP = /[+\-/*]?[\d.]+(px|%|rem|vw|vh|vmin|vmax)?/g;
 const PLACEHOLDER = "$1";
 const ONLYNUMBERS = /[\s\-0-9]/g;
 const PLUS_MINUS = /[-+]/g;
@@ -12,10 +14,10 @@ const CALC_WITH_OPERATOR = /^calc\([-+]/;
 const MINUS_PERCENTAGE = /\s+\-\d+%/g;
 const PLUS_MINUS_WHITESPACE = /\s+(\+|\-)\s+/g;
 const DIVIDE_BY_ZERO = /\/\s?0/g;
-const MULTIPLY_BY_UNIT = /\d+(px|%|rem|vw|vh)\s?\*\s?\d+(px|%|rem|vw|vh)/g;
-const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|rem|vw|vh)/;
-const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|rem|vw|vh)/g;
-const UNITLESS_VALUE_RIGHT = /\d+(px|%|rem|vw|vh)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
+const MULTIPLY_BY_UNIT = /\d+(px|%|rem|vw|vh|vmin|vmax)\s?\*\s?\d+(px|%|rem|vw|vh|vmin|vmax)/g;
+const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|rem|vw|vh|vmin|vmax)/;
+const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|rem|vw|vh|vmin|vmax)/g;
+const UNITLESS_VALUE_RIGHT = /\d+(px|%|rem|vw|vh|vmin|vmax)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
 const CSS_CALC = "CSS calc(): ";
 
 const noClamp = [
@@ -40,7 +42,7 @@ export const transform = ({ prop, value, win, parent, font }) => {
 
   if (value.match(MULTIPLY_BY_UNIT)) {
     throw new Error(
-      CSS_CALC + `cannot multiply by "${RegExp.$1}", number expected.`
+      CSS_CALC + `cannot multiply by "${RegExp.$2}", number expected.`
     );
   }
 
@@ -100,6 +102,12 @@ export const transform = ({ prop, value, win, parent, font }) => {
       modifier = parseFloat(match) / 100;
     } else if (match.match(VIEWPORT_HEIGHT)) {
       refValue = win.height;
+      modifier = parseFloat(match) / 100;
+    } else if (match.match(VIEWPORT_MIN)) {
+      refValue = Math.min(win.width, win.height);
+      modifier = parseFloat(match) / 100;
+    } else if (match.match(VIEWPORT_MAX)) {
+      refValue = Math.max(win.width, win.height);
       modifier = parseFloat(match) / 100;
     } else if (match.match(REM)) {
       refValue = 16;
