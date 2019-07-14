@@ -99,6 +99,144 @@ describe("CSS calc function", () => {
     ).toEqual(288);
   });
 
+  it("should support vmin unit", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmin + 10px)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(250);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmin + 15%)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(255);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50vmin + 10%)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(288);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmin + 10px)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(130);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmin + 15%)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(135);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50vmin + 10%)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(168);
+  });
+
+  it("should support vmax unit", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmax + 10px)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(330);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmax + 15%)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(335);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50vmax + 10%)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(368);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmax + 10px)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(250);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50vmax + 15%)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(255);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50vmax + 10%)",
+        win: {
+          width: 480,
+          height: 240
+        },
+        parent
+      })
+    ).toEqual(288);
+  });
+
   it("should support rem unit", () => {
     expect(
       transform({
@@ -169,6 +307,17 @@ describe("CSS calc function", () => {
       })
     ).toEqual(12);
 
+    expect(() =>
+      transform({
+        prop: "fontSize",
+        value: "calc(100%)",
+        win,
+        parent
+      })
+    ).toThrow("CSS calc(): unable to calculate font-size.");
+  });
+
+  it("should support font-size with viewport units", () => {
     expect(
       transform({
         prop: "fontSize",
@@ -180,15 +329,39 @@ describe("CSS calc function", () => {
         }
       })
     ).toEqual(48);
-
-    expect(() =>
+    expect(
       transform({
         prop: "fontSize",
-        value: "calc(100%)",
+        value: "calc(10vh)",
         win,
-        parent
+        parent,
+        font: {
+          size: 12
+        }
       })
-    ).toThrow("CSS calc(): unable to calculate font-size.");
+    ).toEqual(64);
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(10vmax)",
+        win,
+        parent,
+        font: {
+          size: 12
+        }
+      })
+    ).toEqual(64);
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(10vmin)",
+        win,
+        parent,
+        font: {
+          size: 12
+        }
+      })
+    ).toEqual(48);
   });
 
   it("should handle precision correctly", () => {
@@ -267,6 +440,14 @@ describe("CSS calc function", () => {
         parent
       })
     ).toEqual(387.624);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc((50vmax / 2) + 50vmax - ((50vmax * 0.57735) / 2))",
+        win,
+        parent
+      })
+    ).toEqual(387.624);
   });
 
   it("should only allow multiplication if at least one of the arguments is a number", () => {
@@ -280,6 +461,15 @@ describe("CSS calc function", () => {
         parent
       })
     ).toEqual(40);
+
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10vw * 2)",
+        win,
+        parent
+      })
+    ).toEqual(96);
 
     expect(
       transform({
@@ -352,6 +542,24 @@ describe("CSS calc function", () => {
         parent
       })
     ).toThrow('CSS calc(): cannot multiply by "vh", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(1vh * 1vmax)",
+        win,
+        parent
+      })
+    ).toThrow('CSS calc(): cannot multiply by "vmax", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(1vmax * 1vmin)",
+        win,
+        parent
+      })
+    ).toThrow('CSS calc(): cannot multiply by "vmin", number expected');
   });
 
   it("should only allow division if the right hand side is a number", () => {
@@ -411,6 +619,24 @@ describe("CSS calc function", () => {
         parent
       })
     ).toThrow('CSS calc(): cannot divide by "vw", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10px / 1vmin)",
+        win,
+        parent
+      })
+    ).toThrow('CSS calc(): cannot divide by "vmin", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10px / 1vmax)",
+        win,
+        parent
+      })
+    ).toThrow('CSS calc(): cannot divide by "vmax", number expected');
 
     expect(() =>
       transform({
@@ -512,6 +738,24 @@ describe("CSS calc function", () => {
       transform({
         prop: "width",
         value: "calc(0 + 5px)",
+        win,
+        parent
+      })
+    ).toThrow("CSS calc(): unexpected unitless value.");
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(0 + 5vmin)",
+        win,
+        parent
+      })
+    ).toThrow("CSS calc(): unexpected unitless value.");
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(5vmax - 0)",
         win,
         parent
       })
