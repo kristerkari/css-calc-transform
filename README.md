@@ -1,6 +1,6 @@
 # CSS calc() to Javascript
 
-Tiny library to transform CSS properties with calc() values to pixels based on window and element dimensions.
+Tiny library to transform CSS properties with [CSS calc() function](https://developer.mozilla.org/en-US/docs/Web/CSS/calc) values to pixels based on window and element dimensions.
 
 ## Install
 
