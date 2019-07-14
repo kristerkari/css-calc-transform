@@ -15,10 +15,12 @@
     "README.md"
   ],
   "keywords": [
+    "Javascript",
     "CSS-in-JS",
     "styles",
     "CSS",
-    "calc"
+    "calc",
+    "calc-function"
   ],
   "bugs": {
     "url": "https://github.com/kristerkari/css-calc-transform/issues"
