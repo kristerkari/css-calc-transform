@@ -5,8 +5,9 @@ const VIEWPORT_HEIGHT = /[\d.]+vh/;
 const VIEWPORT_MIN = /[\d.]+vmin/;
 const VIEWPORT_MAX = /[\d.]+vmax/;
 const PIXEL = /(\d+)px/g;
+const EM = /[\d.]+em/;
 const REM = /[\d.]+rem/;
-const MATH_EXP = /[+\-/*]?[\d.]+(px|%|rem|vw|vh|vmin|vmax)?/g;
+const MATH_EXP = /[+\-/*]?[\d.]+(px|%|em|rem|vw|vh|vmin|vmax)?/g;
 const PLACEHOLDER = "$1";
 const ONLYNUMBERS = /[\s\-0-9]/g;
 const PLUS_MINUS = /[-+]/g;
@@ -14,10 +15,10 @@ const CALC_WITH_OPERATOR = /^calc\([-+]/;
 const MINUS_PERCENTAGE = /\s+\-\d+%/g;
 const PLUS_MINUS_WHITESPACE = /\s+(\+|\-)\s+/g;
 const DIVIDE_BY_ZERO = /\/\s?0/g;
-const MULTIPLY_BY_UNIT = /\d+(px|%|rem|vw|vh|vmin|vmax)\s?\*\s?\d+(px|%|rem|vw|vh|vmin|vmax)/g;
-const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|rem|vw|vh|vmin|vmax)/;
-const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|rem|vw|vh|vmin|vmax)/g;
-const UNITLESS_VALUE_RIGHT = /\d+(px|%|rem|vw|vh|vmin|vmax)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
+const MULTIPLY_BY_UNIT = /\d+(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d+(px|%|em|rem|vw|vh|vmin|vmax)/g;
+const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|em|rem|vw|vh|vmin|vmax)/;
+const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|em|rem|vw|vh|vmin|vmax)/g;
+const UNITLESS_VALUE_RIGHT = /\d+(px|%|em|rem|vw|vh|vmin|vmax)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
 const CSS_CALC = "CSS calc(): ";
 
 const noClamp = [
@@ -88,10 +89,13 @@ export const transform = ({ prop, value, win, parent, font }) => {
 
     if (match.match(PERCENT)) {
       if (prop === "fontSize") {
-        if (font && font.size !== undefined) {
-          refValue = font.size;
+        if (parent && parent.font && typeof parent.font.size === "number") {
+          refValue = parent.font.size;
         } else {
-          throw new Error(CSS_CALC + "unable to calculate font-size.");
+          throw new Error(
+            CSS_CALC +
+              `you have to define parent.font.size when using the "%" unit with font-size.`
+          );
         }
       } else {
         refValue = prop === "height" ? parent.height : parent.width;
@@ -109,6 +113,24 @@ export const transform = ({ prop, value, win, parent, font }) => {
     } else if (match.match(VIEWPORT_MAX)) {
       refValue = Math.max(win.width, win.height);
       modifier = parseFloat(match) / 100;
+    } else if (match.match(EM)) {
+      if (prop === "fontSize") {
+        if (parent && parent.font && typeof parent.font.size === "number") {
+          refValue = parent.font.size;
+        } else {
+          throw new Error(
+            CSS_CALC +
+              `you have to define parent.font.size when using the "em" unit with font-size.`
+          );
+        }
+      } else if (font && typeof font.size === "number") {
+        refValue = font.size;
+      } else {
+        throw new Error(
+          CSS_CALC + `you have to define font.size when using the "em" unit.`
+        );
+      }
+      modifier = parseFloat(match);
     } else if (match.match(REM)) {
       refValue = 16;
       modifier = parseFloat(match);

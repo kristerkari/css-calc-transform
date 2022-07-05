@@ -6,8 +6,11 @@ interface TransformOptions {
     height: number;
   };
   parent?: {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
+    font?: {
+      size: number;
+    };
   };
   font?: {
     size: number;
