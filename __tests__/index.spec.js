@@ -1065,6 +1065,42 @@ describe("CSS calc function", () => {
     );
   });
 
+  const unsupportedUnits = [
+    "cm",
+    "mm",
+    "Q",
+    "in",
+    "pc",
+    "pt",
+    "ex",
+    "ch",
+    "lh",
+    "rlh",
+    "vb",
+    "vi"
+  ];
+  unsupportedUnits.forEach(unit => {
+    it(`should throw an error for unsupported unit ${unit}`, () => {
+      expect(() =>
+        transform({
+          prop: "fontSize",
+          value: `calc(100${unit})`,
+          win,
+          parent
+        })
+      ).toThrow(`CSS calc(): unsupported unit ${unit}.`);
+
+      expect(() =>
+        transform({
+          prop: "width",
+          value: `calc(1px + 8${unit})`,
+          win,
+          parent
+        })
+      ).toThrow(`CSS calc(): unsupported unit ${unit}.`);
+    });
+  });
+
   it("should support nested calc() functions", () => {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/calc#Syntax
     // It is permitted to nest calc() functions,

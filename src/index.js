@@ -7,6 +7,7 @@ const VIEWPORT_MAX = /[\d.]+vmax/;
 const PIXEL = /(\d+)px/g;
 const EM = /[\d.]+em/;
 const REM = /[\d.]+rem/;
+const UNIT = /[\d.]+([a-z]+)/i;
 const MATH_EXP = /[+\-/*]?[\d.]+(px|%|em|rem|vw|vh|vmin|vmax)?/g;
 const PLACEHOLDER = "$1";
 const ONLYNUMBERS = /[\s\-0-9]/g;
@@ -142,6 +143,12 @@ export const transform = ({ prop, value, win, parent, font }) => {
   });
 
   if (currentFormula.match(ONLYNUMBERS)) {
+    const unitMatch = currentFormula.match(UNIT);
+    if (unitMatch) {
+      const unit = unitMatch[1];
+      throw new Error(CSS_CALC + `unsupported unit ${unit}.`);
+    }
+
     const result = eval("(" + currentFormula + ")");
     const resultFloat = parseFloat(value.replace(calcPart, result));
 
