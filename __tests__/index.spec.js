@@ -248,6 +248,148 @@ describe("CSS calc function", () => {
     ).toEqual(34);
   });
 
+  it("should support em unit with the font-size property", () => {
+    // When em units are used on font-size, the size is relative to the font-size of the parent.
+    // When used on other properties, it’s relative to the font-size of the element itself.
+    // https://www.digitalocean.com/community/tutorials/css-rem-vs-em-units
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(10px + 2em)",
+        win,
+        parent: {
+          font: {
+            size: 16
+          }
+        }
+      })
+    ).toEqual(42);
+  });
+
+  it("should support em unit with the font-size property and percentages", () => {
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(100% + 2em)",
+        win,
+        parent: {
+          font: {
+            size: 16
+          }
+        }
+      })
+    ).toEqual(48);
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(10% + 1em)",
+        win,
+        parent: {
+          font: {
+            size: 16
+          }
+        }
+      })
+    ).toEqual(17.6);
+  });
+
+  it("should support em unit with non font-size properties", () => {
+    // When em units are used on font-size, the size is relative to the font-size of the parent.
+    // When used on other properties, it’s relative to the font-size of the element itself.
+    // https://www.digitalocean.com/community/tutorials/css-rem-vs-em-units
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(10px + 2em)",
+        win,
+        parent,
+        font: {
+          size: 18
+        }
+      })
+    ).toEqual(46);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50% - 1em)",
+        win,
+        parent,
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(34);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50% - 1.5em)",
+        win,
+        parent,
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(26);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50% - 1.5em)",
+        win,
+        parent,
+        font: {
+          size: 20
+        }
+      })
+    ).toEqual(210);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(50% - 1.5em)",
+        win,
+        parent,
+        font: {
+          size: 2
+        }
+      })
+    ).toEqual(237);
+  });
+
+  it("should support em and throw an error when font size is not defined", () => {
+    expect(() =>
+      transform({
+        prop: "fontSize",
+        value: "calc(50px - 1em)",
+        win,
+        parent
+      })
+    ).toThrow(
+      `CSS calc(): you have to define parent.font.size when using the "em" unit with font-size.`
+    );
+    expect(() =>
+      transform({
+        prop: "height",
+        value: "calc(50% - 1em)",
+        win,
+        parent
+      })
+    ).toThrow(
+      `CSS calc(): you have to define font.size when using the "em" unit.`
+    );
+    expect(() =>
+      transform({
+        prop: "height",
+        value: "calc(50% - 1em)",
+        win,
+        parent,
+        font: {
+          weight: "bold"
+        }
+      })
+    ).toThrow(
+      `CSS calc(): you have to define font.size when using the "em" unit.`
+    );
+  });
+
   it("should support zero as the value", () => {
     expect(
       transform({
@@ -276,9 +418,10 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(100%)",
         win,
-        parent,
-        font: {
-          size: 16
+        parent: {
+          font: {
+            size: 16
+          }
         }
       })
     ).toEqual(16);
@@ -288,9 +431,10 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(60%)",
         win,
-        parent,
-        font: {
-          size: 16
+        parent: {
+          font: {
+            size: 16
+          }
         }
       })
     ).toEqual(9.6);
@@ -300,12 +444,26 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(100%)",
         win,
-        parent,
-        font: {
-          size: 12
+        parent: {
+          font: {
+            size: 12
+          }
         }
       })
     ).toEqual(12);
+
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(100% + 10px)",
+        win,
+        parent: {
+          font: {
+            size: 12
+          }
+        }
+      })
+    ).toEqual(22);
 
     expect(() =>
       transform({
@@ -314,7 +472,9 @@ describe("CSS calc function", () => {
         win,
         parent
       })
-    ).toThrow("CSS calc(): unable to calculate font-size.");
+    ).toThrow(
+      `CSS calc(): you have to define parent.font.size when using the "%" unit with font-size.`
+    );
   });
 
   it("should support font-size with viewport units", () => {
@@ -519,6 +679,18 @@ describe("CSS calc function", () => {
     expect(() =>
       transform({
         prop: "width",
+        value: "calc(2em*15em)",
+        win,
+        parent,
+        font: {
+          size: 14
+        }
+      })
+    ).toThrow('CSS calc(): cannot multiply by "em", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
         value: "calc(100% * 100%)",
         win,
         parent
@@ -601,6 +773,15 @@ describe("CSS calc function", () => {
         parent
       })
     ).toThrow('CSS calc(): cannot divide by "rem", number expected');
+
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10px / 2em)",
+        win,
+        parent
+      })
+    ).toThrow('CSS calc(): cannot divide by "em", number expected');
 
     expect(() =>
       transform({
