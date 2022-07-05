@@ -483,10 +483,7 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(10vw)",
         win,
-        parent,
-        font: {
-          size: 12
-        }
+        parent
       })
     ).toEqual(48);
     expect(
@@ -494,10 +491,7 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(10vh)",
         win,
-        parent,
-        font: {
-          size: 12
-        }
+        parent
       })
     ).toEqual(64);
     expect(
@@ -505,10 +499,7 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(10vmax)",
         win,
-        parent,
-        font: {
-          size: 12
-        }
+        parent
       })
     ).toEqual(64);
     expect(
@@ -516,10 +507,7 @@ describe("CSS calc function", () => {
         prop: "fontSize",
         value: "calc(10vmin)",
         win,
-        parent,
-        font: {
-          size: 12
-        }
+        parent
       })
     ).toEqual(48);
   });
