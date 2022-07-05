@@ -79,4 +79,40 @@ transform({
 330
 ```
 
+When you want to transform CSS `calc()` value containing `em` unit into a number:
+
+```js
+import { transform } from "css-calc-transform";
+
+transform({
+  prop: "fontSize",
+  value: "calc(2em + 1px)",
+  parent: {
+    font: {
+      size: 16
+    }
+  }
+});
+
+↓ ↓ ↓ ↓ ↓ ↓
+
+33
+```
+
+```js
+import { transform } from "css-calc-transform";
+
+transform({
+  prop: "height",
+  value: "calc(10px + 2em)",
+  font: {
+    size: 16
+  }
+});
+
+↓ ↓ ↓ ↓ ↓ ↓
+
+42
+```
+
 For more examples, please have a look at [the tests](__tests__/index.spec.js).
