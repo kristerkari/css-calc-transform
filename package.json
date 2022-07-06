@@ -48,7 +48,7 @@
     "coveralls": "^3.0.1",
     "husky": "^8.0.1",
     "jest": "^23.1.0",
-    "lint-staged": "^7.1.2",
+    "lint-staged": "^13.0.3",
     "npmpub": "^3.1.0",
     "prettier": "^1.13.3",
     "rimraf": "^3.0.2",
