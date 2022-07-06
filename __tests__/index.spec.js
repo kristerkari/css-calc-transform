@@ -512,6 +512,154 @@ describe("CSS calc function", () => {
     ).toEqual(48);
   });
 
+  it("should support min() function", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(10% + min(1%, 1em))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(52.8);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(10% + min(1%))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(52.8);
+  });
+
+  it("should support max() function", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(10% + max(1%, 1em))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(64);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(10% + max(1%))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(52.8);
+  });
+
+  it("should support clamp() function", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(1px + clamp(250px, 50vw, 600px))",
+        win: {
+          width: 520,
+          height: 520
+        }
+      })
+    ).toEqual(520 / 2 + 1);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(1px + clamp(250px,50vw,600px))",
+        win: {
+          width: 520,
+          height: 520
+        }
+      })
+    ).toEqual(520 / 2 + 1);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px, 50%, 500px))",
+        parent: {
+          width: 1000,
+          height: 1000
+        }
+      })
+    ).toEqual(500 + 1000 / 10);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px, 50%, 500px))",
+        parent: {
+          width: 800,
+          height: 800
+        }
+      })
+    ).toEqual(400 + 800 / 10);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px, 50%, 500px))",
+        parent: {
+          width: 600,
+          height: 600
+        }
+      })
+    ).toEqual(350 + 600 / 10);
+  });
+
+  it("should throw an error when clamp has less or more than 3 parameters", () => {
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px))",
+        win,
+        parent
+      })
+    ).toThrow(
+      `CSS calc(): clamp() needs to be called with exactly three parameters`
+    );
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px, 50%))",
+        win,
+        parent
+      })
+    ).toThrow(
+      `CSS calc(): clamp() needs to be called with exactly three parameters`
+    );
+    expect(() =>
+      transform({
+        prop: "width",
+        value: "calc(10% + clamp(350px, 50%, 1px, 2px))",
+        win,
+        parent
+      })
+    ).toThrow(
+      `CSS calc(): clamp() needs to be called with exactly three parameters`
+    );
+  });
+
   it("should handle precision correctly", () => {
     expect(
       transform({

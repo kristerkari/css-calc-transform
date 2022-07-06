@@ -1,4 +1,7 @@
 const CALC_REG = /\bcalc\(([\s\S]+)\)/;
+const CLAMP_REG = /\bclamp\(([\s\S]+)\)/;
+const CLAMP = /clamp\((\d+),\s?(\d+),\s?(\d+)\)/i;
+const MIX_MAX = /(min|max\()/i;
 const PERCENT = /[\d.]+%/;
 const VIEWPORT_WIDTH = /[\d.]+vw/;
 const VIEWPORT_HEIGHT = /[\d.]+vh/;
@@ -21,6 +24,8 @@ const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|em|rem|vw|vh|vmin|vmax)/;
 const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|em|rem|vw|vh|vmin|vmax)/g;
 const UNITLESS_VALUE_RIGHT = /\d+(px|%|em|rem|vw|vh|vmin|vmax)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
 const CSS_CALC = "CSS calc(): ";
+const MIN_MAX_REPLACEMENT = "Math.$1";
+const CLAMP_REPLACEMENT = "Math.max($1, Math.min($2, $3))";
 
 const noClamp = [
   "top",
@@ -149,7 +154,25 @@ export const transform = ({ prop, value, win, parent, font }) => {
       throw new Error(CSS_CALC + `unsupported unit ${unit}.`);
     }
 
-    const result = eval("(" + currentFormula + ")");
+    const clampMatch = currentFormula.match(CLAMP_REG);
+    const isClampWithArgs =
+      clampMatch != null &&
+      typeof clampMatch[0] === "string" &&
+      typeof clampMatch[1] === "string";
+    if (isClampWithArgs) {
+      const args = clampMatch[1].split(",");
+      if (args.length !== 3) {
+        throw new Error(
+          CSS_CALC + `clamp() needs to be called with exactly three parameters.`
+        );
+      }
+    }
+
+    const replacedFunctionsFormula = currentFormula
+      .replace(MIX_MAX, MIN_MAX_REPLACEMENT)
+      .replace(CLAMP, CLAMP_REPLACEMENT);
+
+    const result = eval("(" + replacedFunctionsFormula + ")");
     const resultFloat = parseFloat(value.replace(calcPart, result));
 
     if (noClamp.indexOf(prop) === -1 && resultFloat < 0) {
