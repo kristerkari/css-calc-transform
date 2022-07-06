@@ -1,28 +1,31 @@
 const CALC_REG = /\bcalc\(([\s\S]+)\)/;
 const CLAMP_REG = /\bclamp\(([\s\S]+)\)/;
-const CLAMP = /clamp\((\d+),\s?(\d+),\s?(\d+)\)/i;
+const CLAMP = /clamp\((\d{1,20}),\s?(\d{1,20}),\s?(\d{1,20})\)/i;
 const MIX_MAX = /(min|max\()/i;
-const PERCENT = /[\d.]+%/;
-const VIEWPORT_WIDTH = /[\d.]+vw/;
-const VIEWPORT_HEIGHT = /[\d.]+vh/;
-const VIEWPORT_MIN = /[\d.]+vmin/;
-const VIEWPORT_MAX = /[\d.]+vmax/;
-const PIXEL = /(\d+)px/g;
-const EM = /[\d.]+em/;
-const REM = /[\d.]+rem/;
-const UNIT = /[\d.]+([a-z]+)/i;
-const MATH_EXP = /[+\-/*]?[\d.]+(px|%|em|rem|vw|vh|vmin|vmax)?/g;
+const PERCENT = /[\d.]{1,20}%/;
+const VIEWPORT_WIDTH = /[\d.]{1,20}vw/;
+const VIEWPORT_HEIGHT = /[\d.]{1,20}vh/;
+const VIEWPORT_MIN = /[\d.]{1,20}vmin/;
+const VIEWPORT_MAX = /[\d.]{1,20}vmax/;
+const PIXEL = /(\d{1,20})px/g;
+const EM = /[\d.]{1,20}em/;
+const REM = /[\d.]{1,20}rem/;
+const UNIT = /[\d.]{1,20}([a-z]{1,20})/i;
+const MATH_EXP = /[+\-/*]?[\d.]{1,20}(px|%|em|rem|vw|vh|vmin|vmax)?/g;
 const PLACEHOLDER = "$1";
 const ONLYNUMBERS = /[\s\-0-9]/g;
 const PLUS_MINUS = /[-+]/g;
 const CALC_WITH_OPERATOR = /^calc\([-+]/;
-const MINUS_PERCENTAGE = /\s+\-\d+%/g;
-const PLUS_MINUS_WHITESPACE = /\s+(\+|\-)\s+/g;
+const MINUS_PERCENTAGE = /\s{1,20}\-\d{1,20}%/g;
+const PLUS_MINUS_WHITESPACE = /\s{1,20}(\+|\-)\s{1,20}/g;
 const DIVIDE_BY_ZERO = /\/\s?0/g;
-const MULTIPLY_BY_UNIT = /\d+(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d+(px|%|em|rem|vw|vh|vmin|vmax)/g;
-const DIVIDE_BY_UNIT = /\/\s?\d+(px|%|em|rem|vw|vh|vmin|vmax)/;
-const UNITLESS_VALUE_LEFT = /\d+\s+(\+|\-)\s+\d+(px|%|em|rem|vw|vh|vmin|vmax)/g;
-const UNITLESS_VALUE_RIGHT = /\d+(px|%|em|rem|vw|vh|vmin|vmax)\s+(\+|\-)\s+\d+(\s+|$|\))/g;
+const MULTIPLY_BY_UNIT =
+  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/g;
+const DIVIDE_BY_UNIT = /\/\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/;
+const UNITLESS_VALUE_LEFT =
+  /\d{1,20}\s{1,20}(\+|\-)\s{1,20}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/g;
+const UNITLESS_VALUE_RIGHT =
+  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1,20}(\+|\-)\s{1,20}\d{1,20}(\s{1,20}|$|\))/g;
 const CSS_CALC = "CSS calc(): ";
 const MIN_MAX_REPLACEMENT = "Math.$1";
 const CLAMP_REPLACEMENT = "Math.max($1, Math.min($2, $3))";
@@ -89,7 +92,7 @@ export const transform = ({ prop, value, win, parent, font }) => {
 
   let currentFormula = formula.replace(PIXEL, PLACEHOLDER);
 
-  matches.forEach(match => {
+  matches.forEach((match) => {
     let refValue;
     let modifier;
 
