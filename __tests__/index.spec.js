@@ -882,6 +882,12 @@ describe("CSS calc function", () => {
         value: `calc(10px + myFunction("foo"))`
       })
     ).toEqual(`calc(10px + myFunction("foo"))`);
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa("foo"))`
+      })
+    ).toEqual(`calc(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa("foo"))`);
   });
 
   it("should do nothing when mixing supported and unsupported functions", () => {
