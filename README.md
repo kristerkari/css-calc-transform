@@ -41,7 +41,7 @@ transform({
 ```js
 import { transform } from "css-calc-transform";
 
-const elementDimensions = {
+const parentElementDimensions = {
   width: 480,
   height: 100
 };
@@ -49,7 +49,7 @@ const elementDimensions = {
 transform({
   prop: "width",
   value: "calc(100% - 10px)",
-  parent: elementDimensions
+  parent: parentElementDimensions
 });
 
 ↓ ↓ ↓ ↓ ↓ ↓
