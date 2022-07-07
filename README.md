@@ -21,7 +21,7 @@ npm install --save css-calc-transform
 
 ## Usage
 
-When you want to transform CSS `calc()` value containing pixels into a number:
+### Pixels
 
 ```js
 import { transform } from "css-calc-transform";
@@ -36,7 +36,7 @@ transform({
 38.57142857142857
 ```
 
-When you want to transform CSS `calc()` value containing percentages into a number:
+### Percentages
 
 ```js
 import { transform } from "css-calc-transform";
@@ -57,7 +57,7 @@ transform({
 470
 ```
 
-When you want to transform CSS `calc()` value containing viewport units into a number:
+### Viewport units
 
 ```js
 import { transform } from "css-calc-transform";
@@ -78,7 +78,28 @@ transform({
 330
 ```
 
-When you want to transform CSS `calc()` value containing `em` unit into a number:
+### rem unit
+
+```js
+import { transform } from "css-calc-transform";
+
+transform({
+  prop: "fontSize",
+  value: "calc(2rem + 1px)",
+});
+
+↓ ↓ ↓ ↓ ↓ ↓
+
+33
+```
+
+### em unit
+
+> When em units are used on font-size, the size is relative to the font-size of the parent.
+>
+> When used on other properties, it’s relative to the font-size of the element itself.
+>
+> https://www.digitalocean.com/community/tutorials/css-rem-vs-em-units
 
 ```js
 import { transform } from "css-calc-transform";
@@ -114,4 +135,25 @@ transform({
 42
 ```
 
+## min, max, clamp
+
+```js
+import { transform } from "css-calc-transform";
+
+transform({
+  prop: "height",
+  value: "calc(min(2px) + clamp(100px, 150px, 200px) + max(2px))",
+});
+
+↓ ↓ ↓ ↓ ↓ ↓
+
+154
+```
+
+### More examples
+
 For more examples, please have a look at [the tests](__tests__/index.spec.js).
+
+## Dependencies
+
+- None
