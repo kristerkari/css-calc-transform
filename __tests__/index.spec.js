@@ -861,6 +861,18 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "width",
+        value: `calc(MYFUNCTION(1px))`
+      })
+    ).toEqual(`calc(MYFUNCTION(1px))`);
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(my_function())`
+      })
+    ).toEqual(`calc(my_function())`);
+    expect(
+      transform({
+        prop: "width",
         value: `calc(10px + alert("foo"))`
       })
     ).toEqual(`calc(10px + alert("foo"))`);

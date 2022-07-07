@@ -25,7 +25,7 @@ const UNITLESS_VALUE_LEFT =
   /\d{1,20}\s{1,20}(\+|\-)\s{1,20}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
 const UNITLESS_VALUE_RIGHT =
   /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1,20}(\+|\-)\s{1,20}\d{1,20}(\s{1,20}|$|\))/gi;
-const FUNCTION_CALL = /[a-zA-Z]+\([^\)]*\)(\.[^\)]*\))?/g;
+const FUNCTION_CALL = /([a-zA-Z]+)\([^\)]*\)(\.[^\)]*\))?/g;
 const ALLOWED_FUNCTIONS = /min|max|clamp|calc\(/gi;
 const DISALLOWED_CHARS = /[!$%^&_|~=`\\#{}\[\]:";'<>?]/;
 const CSS_CALC = "CSS calc(): ";
