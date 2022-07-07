@@ -10,11 +10,48 @@ const parent = {
 };
 
 describe("CSS calc function", () => {
+  it("should do nothing if there is no calc function", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: "100%",
+        win,
+        parent
+      })
+    ).toEqual("100%");
+    expect(
+      transform({
+        prop: "width",
+        value: 0,
+        win,
+        parent
+      })
+    ).toEqual(0);
+  });
+
   it("should support percentages ", () => {
     expect(
       transform({
         prop: "width",
         value: "calc(100% - 10px)",
+        win,
+        parent
+      })
+    ).toEqual(470);
+
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(  100% - 10px  )",
+        win,
+        parent
+      })
+    ).toEqual(470);
+
+    expect(
+      transform({
+        prop: "width",
+        value: "CALC(100% - 10PX)",
         win,
         parent
       })
@@ -40,6 +77,22 @@ describe("CSS calc function", () => {
         parent
       })
     ).toEqual(38.57142857142857);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(10PX + (100PX / 3.5))",
+        win,
+        parent
+      })
+    ).toEqual(38.57142857142857);
+    expect(
+      transform({
+        prop: "width",
+        value: "calc( 10px  +  ( 100px  / 3.5 ))",
+        win,
+        parent
+      })
+    ).toEqual(38.57142857142857);
   });
 
   it("should support px unit without passing window dimensions or parent element size", () => {
@@ -56,6 +109,14 @@ describe("CSS calc function", () => {
       transform({
         prop: "height",
         value: "calc(50vh + 10px)",
+        win,
+        parent
+      })
+    ).toEqual(330);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50VH + 10PX)",
         win,
         parent
       })
@@ -84,6 +145,14 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "height",
+        value: "calc(50VW + 10PX)",
+        win,
+        parent
+      })
+    ).toEqual(250);
+    expect(
+      transform({
+        prop: "height",
         value: "calc(50vw + 15%)",
         win,
         parent
@@ -104,6 +173,17 @@ describe("CSS calc function", () => {
       transform({
         prop: "height",
         value: "calc(50vmin + 10px)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(250);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50VMIN + 10PX)",
         win: {
           width: 480,
           height: 640
@@ -183,6 +263,17 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "height",
+        value: "calc(50VMAX + 10PX)",
+        win: {
+          width: 480,
+          height: 640
+        },
+        parent
+      })
+    ).toEqual(330);
+    expect(
+      transform({
+        prop: "height",
         value: "calc(50vmax + 15%)",
         win: {
           width: 480,
@@ -246,6 +337,14 @@ describe("CSS calc function", () => {
         parent
       })
     ).toEqual(34);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(50% - 1REM)",
+        win,
+        parent
+      })
+    ).toEqual(34);
   });
 
   it("should support em unit with the font-size property", () => {
@@ -256,6 +355,18 @@ describe("CSS calc function", () => {
       transform({
         prop: "fontSize",
         value: "calc(10px + 2em)",
+        win,
+        parent: {
+          font: {
+            size: 16
+          }
+        }
+      })
+    ).toEqual(42);
+    expect(
+      transform({
+        prop: "fontSize",
+        value: "calc(10PX + 2EM)",
         win,
         parent: {
           font: {
@@ -399,6 +510,14 @@ describe("CSS calc function", () => {
         parent
       })
     ).toEqual(0);
+    expect(
+      transform({
+        prop: "width",
+        value: "CALC(0)",
+        win,
+        parent
+      })
+    ).toEqual(0);
   });
 
   it("should support fractions without leading zero", () => {
@@ -530,6 +649,34 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "height",
+        value: "CALC(10% + MIN(1%, 1EM))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(52.8);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc( 10% + min( 1% , 1em ))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(52.8);
+    expect(
+      transform({
+        prop: "height",
         value: "calc(10% + min(1%))",
         win,
         parent: {
@@ -561,6 +708,20 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "height",
+        value: "CALC(10% + MAX(1%, 1EM))",
+        win,
+        parent: {
+          width: 480,
+          height: 480
+        },
+        font: {
+          size: 16
+        }
+      })
+    ).toEqual(64);
+    expect(
+      transform({
+        prop: "height",
         value: "calc(10% + max(1%))",
         win,
         parent: {
@@ -579,6 +740,16 @@ describe("CSS calc function", () => {
       transform({
         prop: "width",
         value: "calc(1px + clamp(250px, 50vw, 600px))",
+        win: {
+          width: 520,
+          height: 520
+        }
+      })
+    ).toEqual(520 / 2 + 1);
+    expect(
+      transform({
+        prop: "width",
+        value: "CALC(1PX + CLAMP(250PX, 50VW, 600PX))",
         win: {
           width: 520,
           height: 520
@@ -625,6 +796,105 @@ describe("CSS calc function", () => {
         }
       })
     ).toEqual(350 + 600 / 10);
+  });
+
+  it("should support mixing min/max/clamp", () => {
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(min(1px, 2px) + max(1px, 2px))"
+      })
+    ).toEqual(3);
+    expect(
+      transform({
+        prop: "height",
+        value: "calc(min(2px) + clamp(100px, 150px, 200px) + max(2px))"
+      })
+    ).toEqual(154);
+    expect(
+      transform({
+        prop: "height",
+        value:
+          "calc( min( 2px  )  + clamp( 100px , 150px , 200px ) + max( 2px))"
+      })
+    ).toEqual(154);
+    expect(
+      transform({
+        prop: "height",
+        value:
+          "calc(clamp(100px, 150px, 200px) + min(1px, 2px) + max(1px, 2px))"
+      })
+    ).toEqual(153);
+  });
+
+  it("should allow min, max, clamp, and calc functions to be called", () => {
+    const allowed = ["min", "max", "clamp"];
+    allowed.forEach((fn) => {
+      expect(
+        transform({
+          prop: "width",
+          value: `calc(${fn}(10px, 20px, 30px))`
+        })
+      ).toBeDefined();
+    });
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(calc(10px + 20px))`
+      })
+    ).toBe(30);
+  });
+
+  it("should do nothing when contains unsupported functions", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(alert("foo"))`
+      })
+    ).toEqual(`calc(alert("foo"))`);
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(myFunction())`
+      })
+    ).toEqual(`calc(myFunction())`);
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(10px + alert("foo"))`
+      })
+    ).toEqual(`calc(10px + alert("foo"))`);
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(10px + myFunction("foo"))`
+      })
+    ).toEqual(`calc(10px + myFunction("foo"))`);
+  });
+
+  it("should do nothing when mixing supported and unsupported functions", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(min(1px, 2px) + myFunction("foo"))`
+      })
+    ).toEqual(`calc(min(1px, 2px) + myFunction("foo"))`);
+
+    expect(
+      transform({
+        prop: "width",
+        value: `calc(myFunction("foo") - clamp(350px, 50%, 500px))`
+      })
+    ).toEqual(`calc(myFunction("foo") - clamp(350px, 50%, 500px))`);
+  });
+
+  it("should do nothing when special characters are passed", () => {
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(1 |`^$)"
+      })
+    ).toEqual("calc(1 |`^$)");
   });
 
   it("should throw an error when clamp has less or more than 3 parameters", () => {
@@ -987,7 +1257,7 @@ describe("CSS calc function", () => {
       "marginLeft"
     ];
 
-    noClamp.forEach(prop => {
+    noClamp.forEach((prop) => {
       expect(
         transform({
           prop,
@@ -1215,7 +1485,7 @@ describe("CSS calc function", () => {
     "vb",
     "vi"
   ];
-  unsupportedUnits.forEach(unit => {
+  unsupportedUnits.forEach((unit) => {
     it(`should throw an error for unsupported unit ${unit}`, () => {
       expect(() =>
         transform({
@@ -1245,6 +1515,15 @@ describe("CSS calc function", () => {
       transform({
         prop: "width",
         value: "calc(calc(1px) + calc(2px))",
+        win,
+        parent
+      })
+    ).toEqual(3);
+
+    expect(
+      transform({
+        prop: "width",
+        value: "CALC(CALC(1px) + CALC(2px))",
         win,
         parent
       })

@@ -1,31 +1,33 @@
-const CALC_REG = /\bcalc\(([\s\S]+)\)/;
-const CLAMP_REG = /\bclamp\(([\s\S]+)\)/;
-const CLAMP = /clamp\((\d{1,20}),\s?(\d{1,20}),\s?(\d{1,20})\)/i;
-const MIX_MAX = /(min|max\()/i;
+const CALC_REG = /\bcalc\(([\s\S]+)\)/i;
+const CLAMP_REG = /\bclamp[^(]*\(([^)]*)\)/i;
+const CLAMP = /clamp\((\s?\d{1,20})\s?,\s?(\d{1,20})\s?,\s?(\d{1,20}\s?)\)/i;
+const MIX_MAX = /(min|max\()/gi;
 const PERCENT = /[\d.]{1,20}%/;
-const VIEWPORT_WIDTH = /[\d.]{1,20}vw/;
-const VIEWPORT_HEIGHT = /[\d.]{1,20}vh/;
-const VIEWPORT_MIN = /[\d.]{1,20}vmin/;
-const VIEWPORT_MAX = /[\d.]{1,20}vmax/;
-const PIXEL = /(\d{1,20})px/g;
-const EM = /[\d.]{1,20}em/;
-const REM = /[\d.]{1,20}rem/;
+const VIEWPORT_WIDTH = /[\d.]{1,20}vw/i;
+const VIEWPORT_HEIGHT = /[\d.]{1,20}vh/i;
+const VIEWPORT_MIN = /[\d.]{1,20}vmin/i;
+const VIEWPORT_MAX = /[\d.]{1,20}vmax/i;
+const PIXEL = /(\d{1,20})px/gi;
+const EM = /[\d.]{1,20}em/i;
+const REM = /[\d.]{1,20}rem/i;
 const UNIT = /[\d.]{1,20}([a-z]{1,20})/i;
-const MATH_EXP = /[+\-/*]?[\d.]{1,20}(px|%|em|rem|vw|vh|vmin|vmax)?/g;
+const MATH_EXP = /[+\-/*]?[\d.]{1,20}(px|%|em|rem|vw|vh|vmin|vmax)?/gi;
 const PLACEHOLDER = "$1";
-const ONLYNUMBERS = /[\s\-0-9]/g;
 const PLUS_MINUS = /[-+]/g;
-const CALC_WITH_OPERATOR = /^calc\([-+]/;
+const CALC_WITH_OPERATOR = /^calc\([-+]/i;
 const MINUS_PERCENTAGE = /\s{1,20}\-\d{1,20}%/g;
 const PLUS_MINUS_WHITESPACE = /\s{1,20}(\+|\-)\s{1,20}/g;
 const DIVIDE_BY_ZERO = /\/\s?0/g;
 const MULTIPLY_BY_UNIT =
-  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/g;
-const DIVIDE_BY_UNIT = /\/\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/;
+  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
+const DIVIDE_BY_UNIT = /\/\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/i;
 const UNITLESS_VALUE_LEFT =
-  /\d{1,20}\s{1,20}(\+|\-)\s{1,20}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/g;
+  /\d{1,20}\s{1,20}(\+|\-)\s{1,20}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
 const UNITLESS_VALUE_RIGHT =
-  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1,20}(\+|\-)\s{1,20}\d{1,20}(\s{1,20}|$|\))/g;
+  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1,20}(\+|\-)\s{1,20}\d{1,20}(\s{1,20}|$|\))/gi;
+const FUNCTION_CALL = /[a-zA-Z]+\([^\)]*\)(\.[^\)]*\))?/g;
+const ALLOWED_FUNCTIONS = /min|max|clamp|calc\(/gi;
+const DISALLOWED_CHARS = /[!$%^&_|~=`\\#{}\[\]:";'<>?]/;
 const CSS_CALC = "CSS calc(): ";
 const MIN_MAX_REPLACEMENT = "Math.$1";
 const CLAMP_REPLACEMENT = "Math.max($1, Math.min($2, $3))";
@@ -43,8 +45,24 @@ const noClamp = [
 ];
 
 export const transform = ({ prop, value, win, parent, font }) => {
-  const calcMatches = value.match(CALC_REG);
-  if (!calcMatches) return;
+  const calcMatches = typeof value === "string" && value.match(CALC_REG);
+  if (!calcMatches) {
+    return value;
+  }
+
+  const hasFunctionCalls =
+    typeof calcMatches[1] === "string" && calcMatches[1].match(FUNCTION_CALL);
+  if (hasFunctionCalls) {
+    const functionCalls = calcMatches[1].match(FUNCTION_CALL);
+    const allowedFunctions = calcMatches[1].match(ALLOWED_FUNCTIONS);
+    const allFunctionsAreAllowed =
+      Array.isArray(functionCalls) &&
+      Array.isArray(allowedFunctions) &&
+      functionCalls.length === allowedFunctions.length;
+    if (allowedFunctions === null || !allFunctionsAreAllowed) {
+      return value;
+    }
+  }
 
   if (value.match(UNITLESS_VALUE_LEFT) || value.match(UNITLESS_VALUE_RIGHT)) {
     throw new Error(CSS_CALC + "unexpected unitless value.");
@@ -86,7 +104,7 @@ export const transform = ({ prop, value, win, parent, font }) => {
   }
 
   const calcPart = calcMatches[0];
-  const formula = calcMatches[1].replace(/calc\(/g, "(");
+  const formula = calcMatches[1].replace(/calc\(/gi, "(");
 
   const matches = formula.match(MATH_EXP);
 
@@ -150,37 +168,40 @@ export const transform = ({ prop, value, win, parent, font }) => {
     }
   });
 
-  if (currentFormula.match(ONLYNUMBERS)) {
-    const unitMatch = currentFormula.match(UNIT);
-    if (unitMatch) {
-      const unit = unitMatch[1];
-      throw new Error(CSS_CALC + `unsupported unit ${unit}.`);
-    }
-
-    const clampMatch = currentFormula.match(CLAMP_REG);
-    const isClampWithArgs =
-      clampMatch != null &&
-      typeof clampMatch[0] === "string" &&
-      typeof clampMatch[1] === "string";
-    if (isClampWithArgs) {
-      const args = clampMatch[1].split(",");
-      if (args.length !== 3) {
-        throw new Error(
-          CSS_CALC + `clamp() needs to be called with exactly three parameters.`
-        );
-      }
-    }
-
-    const replacedFunctionsFormula = currentFormula
-      .replace(MIX_MAX, MIN_MAX_REPLACEMENT)
-      .replace(CLAMP, CLAMP_REPLACEMENT);
-
-    const result = eval("(" + replacedFunctionsFormula + ")");
-    const resultFloat = parseFloat(value.replace(calcPart, result));
-
-    if (noClamp.indexOf(prop) === -1 && resultFloat < 0) {
-      return 0;
-    }
-    return resultFloat;
+  if (DISALLOWED_CHARS.test(currentFormula)) {
+    return value;
   }
+
+  const unitMatch = currentFormula.match(UNIT);
+  if (unitMatch) {
+    const unit = unitMatch[1];
+    throw new Error(CSS_CALC + `unsupported unit ${unit}.`);
+  }
+
+  const clampMatch = currentFormula.match(CLAMP_REG);
+  const isClampWithArgs =
+    clampMatch != null &&
+    typeof clampMatch[0] === "string" &&
+    typeof clampMatch[1] === "string";
+  if (isClampWithArgs) {
+    const args = clampMatch[1].split(",");
+    if (args.length !== 3) {
+      throw new Error(
+        CSS_CALC + `clamp() needs to be called with exactly three parameters.`
+      );
+    }
+  }
+
+  const replacedFunctionsFormula = currentFormula
+    .toLocaleLowerCase()
+    .replace(MIX_MAX, MIN_MAX_REPLACEMENT)
+    .replace(CLAMP, CLAMP_REPLACEMENT);
+
+  const result = eval("(" + replacedFunctionsFormula + ")");
+  const resultFloat = parseFloat(value.replace(calcPart, result));
+
+  if (noClamp.indexOf(prop) === -1 && resultFloat < 0) {
+    return 0;
+  }
+  return resultFloat;
 };
