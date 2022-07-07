@@ -198,7 +198,7 @@ export const transform = ({ prop, value, win, parent, font }) => {
   }
 
   const replacedFunctionsFormula = currentFormula
-    .toLocaleLowerCase()
+    .toLowerCase()
     .replace(MIX_MAX, MIN_MAX_REPLACEMENT)
     .replace(CLAMP, CLAMP_REPLACEMENT);
 
