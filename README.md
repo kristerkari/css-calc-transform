@@ -135,14 +135,14 @@ transform({
 42
 ```
 
-## min, max, clamp
+## min(), max(), clamp()
 
 ```js
 import { transform } from "css-calc-transform";
 
 transform({
   prop: "height",
-  value: "calc(min(2px) + clamp(100px, 150px, 200px) + max(2px))",
+  value: "calc(min(2px, 3px) + clamp(100px, 150px, 200px) + max(1px, 2px))",
 });
 
 ↓ ↓ ↓ ↓ ↓ ↓
