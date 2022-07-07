@@ -51,6 +51,15 @@ describe("CSS calc function", () => {
     expect(
       transform({
         prop: "width",
+        value: "   calc(  100%   -   10px  )  ",
+        win,
+        parent
+      })
+    ).toEqual(470);
+
+    expect(
+      transform({
+        prop: "width",
         value: "CALC(100% - 10PX)",
         win,
         parent
@@ -815,7 +824,7 @@ describe("CSS calc function", () => {
       transform({
         prop: "height",
         value:
-          "calc( min( 2px  )  + clamp( 100px , 150px , 200px ) + max( 2px))"
+          "calc( min( 2px  )  + clamp( 100px  ,   150px  ,   200px ) + max( 2px))"
       })
     ).toEqual(154);
     expect(
@@ -1041,6 +1050,15 @@ describe("CSS calc function", () => {
       transform({
         prop: "width",
         value: "calc(20px * 2)",
+        win,
+        parent
+      })
+    ).toEqual(40);
+
+    expect(
+      transform({
+        prop: "width",
+        value: "calc(  20px   *   2 )",
         win,
         parent
       })

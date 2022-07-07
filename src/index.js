@@ -1,5 +1,6 @@
-const CALC_REG = /\bcalc\(([\s\S]+)\)/i;
-const CLAMP_REG = /\bclamp[^(]*\(([^)]*)\)/i;
+const CALC_REG = /^calc\(([\s\S]+)\)$/i;
+const CLAMP_REG = /clamp[(]([^()]*)[)]/i;
+const MULTI_WHITESPACE = /\s{2,10}/g;
 const CLAMP = /clamp\((\s?\d{1,20})\s?,\s?(\d{1,20})\s?,\s?(\d{1,20}\s?)\)/i;
 const MIX_MAX = /(min|max\()/gi;
 const PERCENT = /[\d.]{1,20}%/;
@@ -15,17 +16,17 @@ const MATH_EXP = /[+\-/*]?[\d.]{1,20}(px|%|em|rem|vw|vh|vmin|vmax)?/gi;
 const PLACEHOLDER = "$1";
 const PLUS_MINUS = /[-+]/g;
 const CALC_WITH_OPERATOR = /^calc\([-+]/i;
-const MINUS_PERCENTAGE = /\s{1,20}\-\d{1,20}%/g;
-const PLUS_MINUS_WHITESPACE = /\s{1,20}(\+|\-)\s{1,20}/g;
+const MINUS_PERCENTAGE = /\s{1}\-\d{1,20}%/g;
+const PLUS_MINUS_WHITESPACE = /\s{1}(\+|\-)\s{1}/g;
 const DIVIDE_BY_ZERO = /\/\s?0/g;
 const MULTIPLY_BY_UNIT =
   /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s?\*\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
 const DIVIDE_BY_UNIT = /\/\s?\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/i;
 const UNITLESS_VALUE_LEFT =
-  /\d{1,20}\s{1,20}(\+|\-)\s{1,20}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
+  /\d{1,20}\s{1}(\+|\-)\s{1}\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)/gi;
 const UNITLESS_VALUE_RIGHT =
-  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1,20}(\+|\-)\s{1,20}\d{1,20}(\s{1,20}|$|\))/gi;
-const FUNCTION_CALL = /[a-zA-Z]{1,20}\([^)]*\)?/g;
+  /\d{1,20}(px|%|em|rem|vw|vh|vmin|vmax)\s{1}(\+|\-)\s{1}\d{1,20}(\s{1}|$|\))/gi;
+const FUNCTION_CALL = /[a-zA-Z]{1,20}[(]([^()]*)[)]/g;
 const ALLOWED_FUNCTIONS = /min|max|clamp|calc\(/gi;
 const DISALLOWED_CHARS = /[!$%^&_|~=`\\#{}\[\]:";'<>?]/;
 const CSS_CALC = "CSS calc(): ";
@@ -45,7 +46,8 @@ const noClamp = [
 ];
 
 export const transform = ({ prop, value, win, parent, font }) => {
-  const calcMatches = typeof value === "string" && value.match(CALC_REG);
+  const calcMatches = typeof value === "string" && value.trim().match(CALC_REG);
+
   if (!calcMatches) {
     return value;
   }
@@ -108,7 +110,10 @@ export const transform = ({ prop, value, win, parent, font }) => {
 
   const matches = formula.match(MATH_EXP);
 
-  let currentFormula = formula.replace(PIXEL, PLACEHOLDER);
+  let currentFormula = formula
+    .trim()
+    .replace(MULTI_WHITESPACE, " ")
+    .replace(PIXEL, PLACEHOLDER);
 
   matches.forEach((match) => {
     let refValue;
