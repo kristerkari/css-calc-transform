@@ -1,3 +1,7 @@
+# v1.1.0
+
+- Changed: Replace `eval` with evaluator.js
+
 # v1.0.0
 
 - Added: support for `em` unit.
