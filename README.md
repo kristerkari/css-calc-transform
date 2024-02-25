@@ -156,4 +156,4 @@ For more examples, please have a look at [the tests](__tests__/index.spec.js).
 
 ## Dependencies
 
-- None
+- [evaluator.js](https://github.com/alecrios/evaluator.js) - A replacement for `eval()`

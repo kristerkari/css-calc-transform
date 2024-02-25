@@ -1,3 +1,5 @@
+const evaluate = require("evaluator.js");
+
 const CALC_REG = /^calc\(([\s\S]+)\)$/i;
 const CLAMP_REG = /clamp[(]([^()]*)[)]/i;
 const MULTI_WHITESPACE = /\s{2,10}/g;
@@ -30,8 +32,7 @@ const FUNCTION_CALL = /[a-zA-Z]{1,20}[(]([^()]*)[)]/g;
 const ALLOWED_FUNCTIONS = /min|max|clamp|calc\(/gi;
 const DISALLOWED_CHARS = /[!$%^&_|~=`\\#{}\[\]:";'<>?]/;
 const CSS_CALC = "CSS calc(): ";
-const MIN_MAX_REPLACEMENT = "Math.$1";
-const CLAMP_REPLACEMENT = "Math.max($1, Math.min($2, $3))";
+const CLAMP_REPLACEMENT = "MAX($1, MIN($2, $3))";
 
 const noClamp = [
   "top",
@@ -199,10 +200,10 @@ export const transform = ({ prop, value, win, parent, font }) => {
 
   const replacedFunctionsFormula = currentFormula
     .toLowerCase()
-    .replace(MIX_MAX, MIN_MAX_REPLACEMENT)
+    .replace(MIX_MAX, (val) => val.toUpperCase())
     .replace(CLAMP, CLAMP_REPLACEMENT);
 
-  const result = eval("(" + replacedFunctionsFormula + ")");
+  const result = evaluate("(" + replacedFunctionsFormula + ")");
   const resultFloat = parseFloat(value.replace(calcPart, result));
 
   if (noClamp.indexOf(prop) === -1 && resultFloat < 0) {

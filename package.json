@@ -89,5 +89,8 @@
         "statements": 75
       }
     }
+  },
+  "dependencies": {
+    "evaluator.js": "^3.2.4"
   }
 }

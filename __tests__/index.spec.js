@@ -85,7 +85,7 @@ describe("CSS calc function", () => {
         win,
         parent
       })
-    ).toEqual(38.57142857142857);
+    ).toEqual(38.57142857);
     expect(
       transform({
         prop: "width",
@@ -93,7 +93,7 @@ describe("CSS calc function", () => {
         win,
         parent
       })
-    ).toEqual(38.57142857142857);
+    ).toEqual(38.57142857);
     expect(
       transform({
         prop: "width",
@@ -101,7 +101,7 @@ describe("CSS calc function", () => {
         win,
         parent
       })
-    ).toEqual(38.57142857142857);
+    ).toEqual(38.57142857);
   });
 
   it("should support px unit without passing window dimensions or parent element size", () => {
@@ -110,7 +110,7 @@ describe("CSS calc function", () => {
         prop: "width",
         value: "calc(10px + (100px / 3.5))"
       })
-    ).toEqual(38.57142857142857);
+    ).toEqual(38.57142857);
   });
 
   it("should support vh unit", () => {
@@ -984,7 +984,7 @@ describe("CSS calc function", () => {
         win,
         parent
       })
-    ).toEqual(101.43599999999998);
+    ).toEqual(101.436);
   });
 
   it("should support mixed units", () => {

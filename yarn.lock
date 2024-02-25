@@ -2317,6 +2317,11 @@ esutils@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"
 
+evaluator.js@^3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/evaluator.js/-/evaluator.js-3.2.4.tgz#130b764a2f9465a1439331bc289ca2b5205284fb"
+  integrity sha512-3Ec/fIc5w1oKP+LA0ZhzZ//wkVuwrCz4s7Re6c5VLLu8sHzSSthiv/FFwqOXuwWMy7Iw3oZNvStiXDDk8IAItA==
+
 eventemitter3@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
